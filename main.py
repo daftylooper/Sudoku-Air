@@ -12,7 +12,7 @@ class Button():
     
 def drawGrid():
 
-    blank =np.zeros((900,900),dtype='uint8')
+    blank =np.zeros((1920,1080),dtype='uint8')
     cv.imshow('Blank',blank)
     cv.rectangle(blank, (0,0), (900,900), (255,255,255), thickness=4)
     cv.imshow('Rectangle',blank)
