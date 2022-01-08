@@ -24,21 +24,21 @@ def drawGrid():
         cv.imshow('Rectangle',blank)
     for j in range(0,3):
         for i in range(1,3):
-            cv.rectangle(blank, (0,0+300*j)), (i*100,300), (255,255,255), thickness=2)
+            cv.rectangle(blank, (0,0+300*j), (i*100,300), (255,255,255), thickness=2)
             cv.imshow('Rectangle',blank) 
         for i in range(1,3):
             cv.rectangle(blank, (0,0+300*j), (300,i*100), (255,255,255), thickness=2)
             cv.imshow('Rectangle',blank)
     for j in range(0,3):
         for i in range(4,6):
-            cv.rectangle(blank, (300+300*j,0)), (i*100,600), (255,255,255), thickness=2)
+            cv.rectangle(blank, (300+300*j,0), (i*100,600), (255,255,255), thickness=2)
             cv.imshow('Rectangle',blank) 
         for i in range(4,6):
             cv.rectangle(blank, (300+300*j,0), (600,i*100), (255,255,255), thickness=2)
             cv.imshow('Rectangle',blank)
     for j in range(0,3):
         for i in range(7,9):
-            cv.rectangle(blank, (600+300*j,0)), (i*100,900), (255,255,255), thickness=2)
+            cv.rectangle(blank, (600+300*j,0), (i*100,900), (255,255,255), thickness=2)
             cv.imshow('Rectangle',blank) 
         for i in range(7,9):
             cv.rectangle(blank, (600+300*j,0), (900,i*100), (255,255,255), thickness=2)
