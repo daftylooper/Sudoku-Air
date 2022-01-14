@@ -9,7 +9,6 @@ class handTracking:
         #OS keeps switching the index of cameras, this finds the right one.
         self.capture = cv.VideoCapture(0)
         isTrue, self.frame = self.capture.read()
-        print(type(self.frame))
         if(not(isTrue)):
             self.capture = cv.VideoCapture(1)
 
