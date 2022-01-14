@@ -6,7 +6,7 @@ import numpy
 
 class handTracking:
     def __init__(self):
-        #OS keeps switching the index of cameras, this finds the right one.
+        #OS keeps switching the index of cameras, this finds the right one
         self.capture = cv.VideoCapture(0)
         isTrue, self.frame = self.capture.read()
         if(not(isTrue)):
