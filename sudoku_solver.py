@@ -12,11 +12,12 @@ grid = [[5,3,0,0,7,0,0,0,0],
         [0,0,0,0,0,0,0,0,0]]
 
 class solver():
-    def __init__(self, grid):
+    def __init__(self, someGrid):
         self.solutions = []
-        self.grid = grid
+        self.grid = someGrid
+        self.x = 0
 
-    def possible(self, grid, row, column, number):
+    def possible(self, row, column, number):
         #Is the number appearing in the given row?
         for i in range(0,9):
             if self.grid[row][i] == number:
@@ -42,16 +43,18 @@ class solver():
             for column in range(0,9):
                 if self.grid[row][column] == 0:
                     for number in range(1,10):
-                        if self.possible(self.grid, row, column, number):
+                        if self.possible(row, column, number):
                             self.grid[row][column] = number
                             self.solve()
                             self.grid[row][column] = 0
 
                     return
     
-        self.solutions[self.x] = self.grid
-        print(self.solutions.pop(0))
-        print("\n-------------------------------------------------------------------------")
+        self.solutions.append(self.grid)
+
+    def getSolutions(self):
+        return self.solutions
 
 solvo = solver(grid)
 solvo.solve()
+print(solvo.getSolutions())
