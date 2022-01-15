@@ -5,24 +5,10 @@ import tkinter
 import mathplotlib
 
 class Button():
-  def __init__(self, pos, text, size=[70,70], w, h, x, y):
-    self.pos = pos
-    self.size = size
-    self.text = text
-    self.x=x
-    self.y=y
-    self.h=h
-    self.w=w
-  
-  def draw(self, root):
-        cv.rectangle(root, self.pos, (self.x+self.w, self.y+self.h), (255,255,255),2)
-        cv.putText(root, self.text, (self.x+20, self.y+50), cv.FONT_HERSHEY_PLAIN, 3, (255,255,255), 4)
-        return root
-      
-  def isClicked(self,xcor,ycor):
-    if((xcor>=self.x and xcor<=self.x+self.w) and (ycor>=self.y and ycor<=self.y+self.h)):
-            return True
-        return False
+  def draw():
+
+  def isClicked():
+   
     
 def drawGrid():
 
