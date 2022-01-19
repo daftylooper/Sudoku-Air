@@ -12,23 +12,19 @@ class Button():
     
 def drawGrid():
 
-    blank =np.zeros((1920,1080),dtype='uint8')
-    #cv.imshow('Blank',blank)
+    blank =np.zeros((1920,1920),dtype='uint8')
     cv.rectangle(blank, (0,0), (900,900), (255,255,255), thickness=4)
-    #cv.imshow('Rectangle',blank)
+    cv.rectangle(blank, (1000,0), (1300,300), (255,255,255), thickness=4)
     for i in range(1,3):
         cv.rectangle(blank, (0,0), (i*300,900), (255,255,255), thickness=3)
-        #cv.imshow('Rectangle',blank)
-    for i in range(1,3):
         cv.rectangle(blank, (0,0), (900,i*300), (255,255,255), thickness=3)
-        #cv.imshow('Rectangle',blank)
+        cv.line(blank, (1000,100*i), (1300,100*i), (255,255,255), thickness=2)
     for i in range(1,9): 
-        cv.line(blank, (i*100,0), (i*100,900), (255,255,255), thickness=2)
-        #cv.imshow('Line',blank)
-    for i in range(1,9):
-        cv.line(blank, (0,i*100), (900,i*100), (255,255,255), thickness=2)
-        #cv.imshow('Line',blank)
-    cv.imshow('Line',blank)
+        cv.line(blank, (i*100,0), (i*100,900), (255,255,255), thickness=1)
+        cv.line(blank, (0,i*100), (900,i*100), (255,255,255), thickness=1)
+    for i in range(11,13):
+        cv.line(blank, (100*i,0), (100*i,300), (255,255,255), thickness=2)
+    cv.imshow('Line', blank)
     cv.waitKey(0)
 
 keypad = []
