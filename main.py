@@ -6,6 +6,7 @@ import startscreen
 import sudoku_solver
 import random
 
+#Variables and Object Initializations
 winx = 650
 winy = 1200
 frame = np.zeros((winx, winy, 3), dtype='uint8')
@@ -14,7 +15,7 @@ sudokuGrid = np.zeros((9, 9), dtype=int)
 tracker = handtracker.handTracking()
 solver = sudoku_solver.solver()
 pickler = utils.pickler(sudokuGrid)
-pickler.unpickle() #Load all the levels
+#pickler.unpickle() #Load all the levels
 current = 0
 run = True
 startScreen = True
@@ -55,18 +56,20 @@ while run:
     newpuzzle.draw()
 
     utils.Grid.drawGrid(frame, 600, 600, 596, 23)
+    utils.Grid.renderElements(frame, sudokuGrid)
 
-    if(reset.withinButton(cor, state)):
-      sudokuGrid = np.zeros((9, 9))
-    if(solve.withinButton(cor, state)):
-      solver.solve(sudokuGrid)
-      solutions = solver.solutions()
-      solver = solutions[0]
-    if(newpuzzle.withinButton(cor, state)):
-      #Unpickle puzzle'th puzzle in stored sudoku's
-      unpickledpuzzles = pickler.unpickle()
-      puzzle = random.randint(0, len(unpickledpuzzles)-1) #Put of a limit from 0-n, where there are n-1 grids pickled and stored
-      sudokuGrid = unpickledpuzzles[puzzle]
+    if(state): #Only check for button-clicks if user clicks
+      if(reset.withinButton(cor, state)):
+        sudokuGrid = np.ones((9, 9), dtype=int)
+      if(solve.withinButton(cor, state)):
+        solver.solve(sudokuGrid)
+        solutions = solver.solutions
+        sudokuGrid = solutions[0] #based on the number of solutions, you can choose any. future feature?
+      if(newpuzzle.withinButton(cor, state)):
+        #Unpickle the puzzle'th puzzle in stored sudoku's
+        unpickledpuzzles = pickler.unpickle()
+        puzzle = random.randint(0, len(unpickledpuzzles)) #Put of a limit from 0-n, where there are n-1 grids pickled and stored
+        sudokuGrid = unpickledpuzzles[puzzle]
 
     #cv.imshow("Sudoku Air", cv.bitwise_or(videoFeed, frame)
     
