@@ -38,6 +38,11 @@ class Grid():
         for i in range(1,9):
             cv.line(blank, (xshift, i*int(y/9)+yshift), (x+xshift, i*int(y/9)+yshift), (255,255,255), thickness=2)
 
+    def renderElements(frame, grid):
+        for i in range(0, 9):
+            for j in range(0, 9):
+                cv.putText(frame, str(grid[i][j]), (596+22+66*i, 23+50+66*j), cv.FONT_HERSHEY_PLAIN, 3, (0, 0, 0), 4)
+
 class pickler():
     def __init__(self, topickle):
         self.puzzles = topickle
@@ -48,6 +53,8 @@ class pickler():
         pickle.dump(self.puzzles, outfile)
         outfile.close()
     def unpickle(self):
+        if(os.path.exists("sudoku_puzzles.txt")):
+            self.pickle()
         outfile = open("sudoku_puzzles", 'rb')
         self.puzzles = pickle.load(outfile)
         outfile.close()
