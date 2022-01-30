@@ -3,15 +3,21 @@ import time
 import mediapipe as mp
 import math
 import numpy
+import os
 
 class handTracking:
     def __init__(self):
         #OS keeps switching the index of cameras, this finds the right one.
-        self.capture = cv.VideoCapture(0)
-        isTrue, self.frame = self.capture.read()
-        print(type(self.frame))
-        if(not(isTrue)):
-            self.capture = cv.VideoCapture(1)
+        cameraFound = False
+        n = 0
+        while not(cameraFound) and n<10:
+            self.capture = cv.VideoCapture(n)
+            time.sleep(0.1)
+            isTrue, self.frame = self.capture.read()
+            time.sleep(0.1)
+            if(isTrue): cameraFound=True
+            n+=1
+            print(n)
 
         self.mpHands = mp.solutions.hands
         self.hands = self.mpHands.Hands()
@@ -45,7 +51,7 @@ class handTracking:
 
         self.cTime = time.time()
         fps = 1/(self.cTime-self.pTime)
-        pTime = self.cTime
+        self.pTime = self.cTime
 
         cv.putText(self.frame, str(int(fps)), (20, 625), cv.FONT_ITALIC, 3, (0, 0, 255), 3)
 
@@ -60,7 +66,7 @@ class handTracking:
 
     def ifClicked(self):
         dist = ((self.middleFingerCor[0]-self.thumbFingerCor[0])*(self.thumbFingerCor[1]-self.indexFingerCor[1]) - (self.thumbFingerCor[0]-self.indexFingerCor[0])*(self.middleFingerCor[1]-self.thumbFingerCor[1]))/math.hypot(self.middleFingerCor[0]-self.thumbFingerCor[0], self.middleFingerCor[1]-self.thumbFingerCor[1])
-        if(dist<=0): #  For now 0 is the threshold, it can even be a +ve num so the user doesn't have to bend finger too low
+        if(dist<=10): #  For now 0 is the threshold, it can even be a +ve num so the user doesn't have to bend finger too low
             return tuple((self.indexFingerCor[0], self.indexFingerCor[1])), True
         return tuple((0, 0)), False
 
