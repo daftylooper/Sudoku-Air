@@ -1,78 +1,95 @@
 import cv2 as cv
+import numpy as np
+import utils
+import handtracker
+import startscreen
+import sudoku_solver
+import random
 import time
-import mediapipe as mp
-import math
-import numpy
-import os
 
-class handTracking:
-    def __init__(self):
-        #OS keeps switching the index of cameras, this finds the right one.
-        cameraFound = False
-        n = 0
-        while not(cameraFound) and n<10:
-            self.capture = cv.VideoCapture(n)
-            time.sleep(0.1)
-            isTrue, self.frame = self.capture.read()
-            time.sleep(0.1)
-            if(isTrue): cameraFound=True
-            n+=1
-            print(n)
+#Variables and Object Initializations
+winx = 650
+winy = 1200
+frame = np.zeros((winx, winy, 3), dtype='uint8')
+keypad=[]
+sudokuGrid = [[3, 0, 6, 5, 0, 8, 4, 0, 0],
+              [5, 2, 0, 0, 0, 0, 0, 0, 0],
+              [0, 8, 7, 0, 0, 0, 0, 3, 1],
+              [0, 0, 3, 0, 1, 0, 0, 8, 0],
+              [9, 0, 0, 8, 6, 3, 0, 0, 5],
+              [0, 5, 0, 0, 9, 0, 6, 0, 0],
+              [1, 3, 0, 0, 0, 0, 2, 5, 0],
+              [0, 0, 0, 0, 0, 0, 0, 7, 4],
+              [0, 0, 5, 2, 0, 6, 3, 0, 0]]
+tracker = handtracker.handTracking()
+solver = sudoku_solver.solver()
+pickler = utils.pickler(sudokuGrid)
+#pickler.unpickle() #Load all the levels
+current = 0
+run = True
+startScreen = True
+mainScreen = False
 
-        self.mpHands = mp.solutions.hands
-        self.hands = self.mpHands.Hands()
-        self.mpDraw = mp.solutions.drawing_utils
-        self.coords = tuple((0, 0))
+while run:
+  tracker.getCapture(winy, winx)
+  tracker.drawLandmark()
+  cor, state = tracker.ifClicked()
+  frame = tracker.returnProcessedVideoFeed()
+  #utils.Grid.drawGrid(frame, 600, 600, 0, 0)
 
-        self.pTime = 0
-        self.cTime = 0
+  if(startScreen):
+    frame, startbutton = startscreen.drawStartScreen(frame, 17, 17)
+    if(startbutton.withinButton(cor, state)):
+      startScreen = False
+      mainScreen = True
 
-    def getCapture(self, width, height):
-        self.isTrue, self.frame = self.capture.read()
-        self.frame = cv.resize(cv.flip(self.frame, 1), (width, height), interpolation=cv.INTER_CUBIC)
-        self.rgbframe = cv.cvtColor(self.frame, cv.COLOR_BGR2RGB)
+  if(mainScreen):
+    # DEFINE ALL THE BUTTONS
+    reset=utils.Button(frame, [5,285], "RESET", [200,70])
+    solve=utils.Button(frame, [5,375], "SOLVE", [200,70])
+    newpuzzle=utils.Button(frame, [5,465], "NEW", [200,70])
 
-    def drawLandmark(self):
-        self.result = self.hands.process(self.rgbframe)
-        if self.result.multi_hand_landmarks:
-            for handLandmarks in self.result.multi_hand_landmarks: #Loop through ladnmark data that the model fetches
-                self.indexFingerCor = self.getLandmarkCor(handLandmarks, 8)
-                self.coords = self.indexFingerCor
-                self.thumbFingerCor = self.getLandmarkCor(handLandmarks, 4)
-                self.middleFingerCor = self.getLandmarkCor(handLandmarks, 12)
+    k=1
+    for x in range(0, 3):
+      for y in range(0, 3):
+        keypad.append(utils.Button(frame, [70*y+5, 70*x+5], str(k)))
+        k+=1
 
-                cv.line(self.frame, self.thumbFingerCor, self.middleFingerCor, (255, 0, 0), thickness=2)
-                cv.line(self.frame, self.thumbFingerCor, self.indexFingerCor, (255, 0, 0), thickness=2)
-                cv.line(self.frame, self.indexFingerCor, self.middleFingerCor, (255, 0, 0), thickness=2)
+    #DRAW THE BUTTONS AND GRID
+    for key in keypad:
+      key.draw()
+      #key.highlightButton()
 
-                cv.circle(self.frame, self.indexFingerCor, 15, (0,255,255), thickness=-1)
+    reset.draw()
+    solve.draw()
+    newpuzzle.draw()
 
-                self.mpDraw.draw_landmarks(self.frame, handLandmarks, self.mpHands.HAND_CONNECTIONS)
+    utils.Grid.drawGrid(frame, 600, 600, 596, 23)
+    utils.Grid.renderElements(frame, sudokuGrid)
 
-        self.cTime = time.time()
-        fps = 1/(self.cTime-self.pTime)
-        self.pTime = self.cTime
+    if(state): #Only check for button-clicks if user clicks
+      if(reset.withinButton(cor, state)):
+        sudokuGrid = np.ones((9, 9), dtype=int)
+      if(solve.withinButton(cor, state)):
+        solver.solve(sudokuGrid)
+        solutions = solver.solutions
+        sudokuGrid = solutions[0] #based on the number of solutions, you can choose any. future feature?
+      if(newpuzzle.withinButton(cor, state)):
+        #Unpickle the puzzle'th puzzle in stored sudoku's
+        unpickledpuzzles = pickler.unpickle()
+        puzzle = random.randint(0, len(unpickledpuzzles)) #Put of a limit from 0-n, where there are n-1 grids pickled and stored
+        sudokuGrid = unpickledpuzzles[puzzle]
 
-        cv.putText(self.frame, str(int(fps)), (20, 625), cv.FONT_ITALIC, 3, (0, 0, 255), 3)
+      if(cor[0]<210 and cor[1]<210):
+        row = (cor[0]//70)+1
+        col = (cor[1]//70)+1
+        num = col*3 - (3-row)
+        print(num)
 
-    def getLandmarkCor(self, handLandmarks, id=0): #Returns Tuple containing coordinates of specified landmark
-        Finger = handLandmarks.landmark[id]
-        height, width, channel = self.frame.shape
-        FingerCor = tuple((int(Finger.x*width), int(Finger.y*height)))
-        return FingerCor
+    #cv.imshow("Sudoku Air", cv.bitwise_or(videoFeed, frame) 
+    
+  cv.imshow("Sudoku Air", frame)
 
-    def getCoords(self):
-        return self.coords
-
-    def ifClicked(self):
-        dist = ((self.middleFingerCor[0]-self.thumbFingerCor[0])*(self.thumbFingerCor[1]-self.indexFingerCor[1]) - (self.thumbFingerCor[0]-self.indexFingerCor[0])*(self.middleFingerCor[1]-self.thumbFingerCor[1]))/math.hypot(self.middleFingerCor[0]-self.thumbFingerCor[0], self.middleFingerCor[1]-self.thumbFingerCor[1])
-        if(dist<=10): #  For now 0 is the threshold, it can even be a +ve num so the user doesn't have to bend finger too low
-            return tuple((self.indexFingerCor[0], self.indexFingerCor[1])), True
-        return tuple((0, 0)), False
-
-    def returnProcessedVideoFeed(self):
-        return self.frame
-
-    def stopRender(self):
-        self.capture.release()
-        cv.destroyAllWindows()
+  if cv.waitKey(20) & 0xFF==ord('d'):
+    tracker.stopRender()
+    break
