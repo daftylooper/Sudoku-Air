@@ -7,7 +7,7 @@ As the interface between a human and a machine gets more seamless, the need for 
 <h1><b>How to Run This?</b></h1>
 <ul>
   <li>Step-1: Download the project files and places them in the directory you wish</li>
-  <li>Step-2: Now, install the necceary packages on the command line, run </li><code>pip3 install -r requirements.txt</code>. 
+  <li>Step-2: Run </li><code>pip3 install -r requirements.txt</code> to install the libraries needed. 
   <b>Note: </b>The libraries use upto ~100MB of disk space.
   <li>Step-3: Run the <code>main.py</code> file and you should be able to now play Sudoku</li>
 </ul>
