@@ -1,3 +1,5 @@
+<p align='center'><img src='https://i.ibb.co/Q8jmrRx/sudoku-air.png' alt='Sudoku Air logo'></p>
+
 <h1><b>What is this?</b></h1>
 Sudoku, but interact-able by your hand. All movements are predicted using MediaPipe, through a video feed.
 
